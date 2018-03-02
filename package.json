@@ -1,6 +1,6 @@
 {
   "name": "http-on-off-adapter",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Simple HTTP On/Off Switch",
   "main": "index.js",
   "keywords": [
@@ -29,7 +29,7 @@
   "moziot": {
     "api": {
       "min": 1,
-      "max": 1
+      "max": 2
     },
     "plugin": true,
     "exec": "{nodeLoader} {path}",

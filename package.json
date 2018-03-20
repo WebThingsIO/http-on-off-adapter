@@ -34,7 +34,7 @@
     "plugin": true,
     "exec": "{nodeLoader} {path}",
     "config": {
-      "url": "http://wifi101.local"
+      "url": ["http://wifi101.local"]
     }
   }
 }

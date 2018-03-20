@@ -69,10 +69,22 @@ class HttpOnOffProperty extends Property {
 
 class HttpOnOffDevice extends Device {
   constructor(adapter, id, url) {
-    super(adapter, id);
+
+    // If the URL looks like http://wifi101-123456.local then extract
+    // 123456 as the suffix to use for the device id and LED name.
+
+    let urlPiece = url.split(/[-.]/);
+    let suffix;
+    if (urlPiece.length == 3) {
+      suffix = '-' + urlPiece[1];
+    } else {
+      suffix = '';
+    }
+
+    super(adapter, id + suffix);
 
     this.url = url;
-    this.name = 'LED';
+    this.name = 'LED' + suffix;
     this.type = 'onOffLight';
     this.description = 'Simple HTTP OnOff Light';
 
@@ -94,15 +106,20 @@ class HttpOnOffAdapter extends Adapter {
 
 function loadHttpOnOffAdapter(addonManager, manifest, _errorCallback) {
   let adapter = new HttpOnOffAdapter(addonManager, manifest.name);
-  let url = manifest.moziot.config.url;
-  if (!url) {
+  let urls = manifest.moziot.config.url;
+  if (!urls) {
     console.error('No URL specified in config');
     return;
   }
-
-  adapter.handleDeviceAdded(new HttpOnOffDevice(adapter,
-                                                'HttpOnOffDevice-01',
-                                                url));
+  if (!Array.isArray(urls)) {
+    urls = [urls];
+  }
+  for (const url of urls) {
+    adapter.handleDeviceAdded(
+      new HttpOnOffDevice(adapter,
+                          'HttpOnOffDevice',
+                          url));
+  }
 }
 
 module.exports = loadHttpOnOffAdapter;

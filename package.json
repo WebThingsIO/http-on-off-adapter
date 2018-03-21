@@ -1,6 +1,6 @@
 {
   "name": "http-on-off-adapter",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Simple HTTP On/Off Switch",
   "main": "index.js",
   "keywords": [
@@ -26,6 +26,9 @@
     "http-on-off-adapter.js",
     "index.js"
   ],
+  "dependencies": {
+    "mdns-js": "github:dhylands/node-mdns-js#pr-77"
+  },
   "moziot": {
     "api": {
       "min": 1,
@@ -34,7 +37,7 @@
     "plugin": true,
     "exec": "{nodeLoader} {path}",
     "config": {
-      "url": ["http://wifi101.local"]
+      "url": []
     }
   }
 }

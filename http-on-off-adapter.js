@@ -10,6 +10,12 @@
 
 const fetch = require('node-fetch');
 
+// Note that this is a patched version of mdns-js. It has PR #77 applied.
+// The author of PR#77 put his change on master, so I forked mdns-js and
+// created a pr-77 branch in my fork of the original so that we could
+// create a dependency spec which works under both npm install and yarn.
+const mdns = require('mdns-js');
+
 let Adapter, Device, Property;
 try {
   Adapter = require('../adapter');
@@ -88,8 +94,6 @@ class HttpOnOffDevice extends Device {
     this.type = 'onOffLight';
     this.description = 'Simple HTTP OnOff Light';
 
-    console.log('Device URL:', url, 'added');
-
     this.properties.set('on', new HttpOnOffProperty(this, 'on', {
       type: 'boolean',
       value: false,
@@ -101,6 +105,51 @@ class HttpOnOffAdapter extends Adapter {
   constructor(addonManager, packageName) {
     super(addonManager, 'HttpOnOffAdapter', packageName);
     addonManager.addAdapter(this);
+
+    let browser = mdns.createBrowser(mdns.tcp('http'));
+    browser.on('ready', () => {
+      console.log('Starting discovery...');
+      browser.discover();
+    });
+    browser.on('update', (data) => {
+      // The firmware from the http-on-off-wifi101 repository will wind up
+      // creating a data record which looks like the following:
+      //
+      //  data: { addresses: [ '192.168.1.77' ],
+      //  query: [],
+      //  port: 80,
+      //  fullname: 'http-on-off._moziot._tcp.local',
+      //  txt: [ '_services' ],
+      //  type:
+      //   [ { name: 'dns-sd',
+      //       protocol: 'udp',
+      //       subtypes: [],
+      //       description: undefined },
+      //     { name: 'moziot',
+      //       protocol: 'tcp',
+      //       subtypes: [],
+      //       description: undefined } ],
+      //  host: 'wifi101-F714A9.local',
+      //  interfaceIndex: 1,
+      //  networkInterface: 'pseudo multicast' }
+
+      if (data.hasOwnProperty('fullname') && data.hasOwnProperty('host')) {
+        let fullname = data.fullname;
+        let host = data.host;
+        if (typeof fullname === 'string' && typeof host === 'string') {
+          if (fullname.startsWith('http-on-off.') && host.startsWith('wifi101')) {
+            let address = '';
+            if (Array.isArray(data.addresses) && data.addresses.length > 0) {
+              address = ' @ ' + data.addresses[0];
+            }
+            let url = 'http://' + host;
+            console.log('Adding', url, '(via mDNS Discovery' + address + ')');
+            this.handleDeviceAdded(
+              new HttpOnOffDevice(this, 'HttpOnOffDevice', url));
+          }
+        }
+      }
+    });
   }
 }
 
@@ -115,10 +164,9 @@ function loadHttpOnOffAdapter(addonManager, manifest, _errorCallback) {
     urls = [urls];
   }
   for (const url of urls) {
+    console.log('Adding URL:', url, '(via config)');
     adapter.handleDeviceAdded(
-      new HttpOnOffDevice(adapter,
-                          'HttpOnOffDevice',
-                          url));
+      new HttpOnOffDevice(adapter, 'HttpOnOffDevice', url));
   }
 }
 

@@ -137,7 +137,8 @@ class HttpOnOffAdapter extends Adapter {
         let fullname = data.fullname;
         let host = data.host;
         if (typeof fullname === 'string' && typeof host === 'string') {
-          if (fullname.startsWith('http-on-off.') && host.startsWith('wifi101')) {
+          if (fullname.startsWith('http-on-off.') &&
+              host.startsWith('wifi101')) {
             let address = '';
             if (Array.isArray(data.addresses) && data.addresses.length > 0) {
               address = ' @ ' + data.addresses[0];

@@ -1,6 +1,6 @@
 {
   "name": "http-on-off-adapter",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "Simple HTTP On/Off Switch",
   "main": "index.js",
   "keywords": [
@@ -38,6 +38,20 @@
     "exec": "{nodeLoader} {path}",
     "config": {
       "url": []
+    },
+    "schema": {
+      "type": "object",
+      "required": [
+        "url"
+      ],
+      "properties": {
+        "url": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
     }
   }
 }

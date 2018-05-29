@@ -55,16 +55,16 @@ class HttpOnOffProperty extends Property {
     return new Promise((resolve, reject) => {
       let url;
       if (value) {
-        url = this.device.url + '/H';
+        url = `${this.device.url}/H`;
       } else {
-        url = this.device.url + '/L';
+        url = `${this.device.url}/L`;
       }
       fetch(url).then(() => {
         this.setCachedValue(value);
         console.log('Property:', this.name, 'set to:', this.value);
         resolve(value);
         this.device.notifyPropertyChanged(this);
-      }).catch(e => {
+      }).catch((e) => {
         console.error('Request to:', url, 'failed');
         console.error(e);
         reject(e);
@@ -75,14 +75,13 @@ class HttpOnOffProperty extends Property {
 
 class HttpOnOffDevice extends Device {
   constructor(adapter, id, url) {
-
     // If the URL looks like http://wifi101-123456.local then extract
     // 123456 as the suffix to use for the device id and LED name.
 
-    let urlPiece = url.split(/[-.]/);
+    const urlPiece = url.split(/[-.]/);
     let suffix;
     if (urlPiece.length == 3) {
-      suffix = '-' + urlPiece[1];
+      suffix = `-${urlPiece[1]}`;
     } else {
       suffix = '';
     }
@@ -90,7 +89,7 @@ class HttpOnOffDevice extends Device {
     super(adapter, id + suffix);
 
     this.url = url;
-    this.name = 'LED' + suffix;
+    this.name = `LED${suffix}`;
     this.type = 'onOffLight';
     this.description = 'Simple HTTP OnOff Light';
 
@@ -106,7 +105,7 @@ class HttpOnOffAdapter extends Adapter {
     super(addonManager, 'HttpOnOffAdapter', packageName);
     addonManager.addAdapter(this);
 
-    let browser = mdns.createBrowser(mdns.tcp('http'));
+    const browser = mdns.createBrowser(mdns.tcp('http'));
     browser.on('ready', () => {
       console.log('Starting discovery...');
       browser.discover();
@@ -134,17 +133,17 @@ class HttpOnOffAdapter extends Adapter {
       //  networkInterface: 'pseudo multicast' }
 
       if (data.hasOwnProperty('fullname') && data.hasOwnProperty('host')) {
-        let fullname = data.fullname;
-        let host = data.host;
+        const fullname = data.fullname;
+        const host = data.host;
         if (typeof fullname === 'string' && typeof host === 'string') {
           if (fullname.startsWith('http-on-off.') &&
               host.startsWith('wifi101')) {
             let address = '';
             if (Array.isArray(data.addresses) && data.addresses.length > 0) {
-              address = ' @ ' + data.addresses[0];
+              address = ` @ ${data.addresses[0]}`;
             }
-            let url = 'http://' + host;
-            console.log('Adding', url, '(via mDNS Discovery' + address + ')');
+            const url = `http://${host}`;
+            console.log(`Adding ${url} (via mDNS Discovery ${address})`);
             this.handleDeviceAdded(
               new HttpOnOffDevice(this, 'HttpOnOffDevice', url));
           }
@@ -155,7 +154,7 @@ class HttpOnOffAdapter extends Adapter {
 }
 
 function loadHttpOnOffAdapter(addonManager, manifest, _errorCallback) {
-  let adapter = new HttpOnOffAdapter(addonManager, manifest.name);
+  const adapter = new HttpOnOffAdapter(addonManager, manifest.name);
   let urls = manifest.moziot.config.url;
   if (!urls) {
     console.error('No URL specified in config');

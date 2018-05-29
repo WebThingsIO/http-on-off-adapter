@@ -29,6 +29,9 @@
   "dependencies": {
     "mdns-js": "github:dhylands/node-mdns-js#pr-77"
   },
+  "devDependencies": {
+    "eslint": "^4.19.1"
+  },
   "moziot": {
     "api": {
       "min": 1,

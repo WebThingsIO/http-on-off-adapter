@@ -90,10 +90,13 @@ class HttpOnOffDevice extends Device {
 
     this.url = url;
     this.name = `LED${suffix}`;
+    this['@type'] = ['OnOffSwitch', 'Light'];
     this.type = 'onOffLight';
-    this.description = 'Simple HTTP OnOff Light';
+    this.description = 'Simple HTTP On/Off Light';
 
     this.properties.set('on', new HttpOnOffProperty(this, 'on', {
+      '@type': 'OnOffProperty',
+      label: 'On/Off',
       type: 'boolean',
       value: false,
     }));

@@ -1,7 +1,7 @@
 {
   "name": "http-on-off-adapter",
   "display_name": "HTTP On/Off",
-  "version": "0.3.5",
+  "version": "0.4.0",
   "description": "Simple HTTP On/Off Switch",
   "main": "index.js",
   "keywords": [
